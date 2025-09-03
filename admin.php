@@ -157,12 +157,6 @@ $result_classes = mysqli_query($db, $query_classes);
             <label for="start_time">开始时间:</label>
             <input type="datetime-local" name="start_time" required>
 
-            <label for="field">场地:</label>
-            <select name="field">
-                <option value="A">场地 A</option>
-                <option value="B">场地 B</option>
-            </select>
-
             <label hidden for="result">结果:</label>
             <input hidden type="radio" name="result" value="未结束" checked> 
             <input hidden type="radio" name="result" value="A胜利">
@@ -178,7 +172,6 @@ $result_classes = mysqli_query($db, $query_classes);
             <th>班级 A</th>
             <th>班级 B</th>
             <th>开始时间</th>
-            <th>场地</th>
             <th>结果</th>
             <th>操作</th>
         </tr>
@@ -210,12 +203,6 @@ $result_classes = mysqli_query($db, $query_classes);
                 </td>
                 <td>
                     <input type="datetime-local" name="start_time" value="<?= $match['start_time'] ?>" required>
-                </td>
-                <td>
-                    <select name="field">
-                        <option value="A" <?= $match['field'] == 'A' ? 'selected' : '' ?>>场地 A</option>
-                        <option value="B" <?= $match['field'] == 'B' ? 'selected' : '' ?>>场地 B</option>
-                    </select>
                 </td>
                 <td>
                     <input type="radio" name="result" value="未结束" <?= $match['result'] == '未结束' ? 'checked' : '' ?>> 未结束

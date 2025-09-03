@@ -4,23 +4,14 @@ include 'db.php';
 // 获取当前时间
 $current_time = date('Y-m-d H:i:s');
 
-// 获取场地A和场地B的比赛信息，包含所有比赛，不仅是正在进行的
-$query_a = "SELECT * FROM `matches` WHERE `field` = 'A' ORDER BY `start_time` ASC";
-$query_b = "SELECT * FROM `matches` WHERE `field` = 'B' ORDER BY `start_time` ASC";
+// 获取所有比赛信息，按开始时间排序
+$query = "SELECT * FROM `matches` ORDER BY `start_time` ASC";
+$result = mysqli_query($db, $query);
 
-$result_a = mysqli_query($db, $query_a);
-$result_b = mysqli_query($db, $query_b);
-
-// 获取所有场地 A 和场地 B 的比赛
-$matches_a = [];
-$matches_b = [];
-
-while ($row = mysqli_fetch_assoc($result_a)) {
-    $matches_a[] = $row;
-}
-
-while ($row = mysqli_fetch_assoc($result_b)) {
-    $matches_b[] = $row;
+// 获取所有比赛
+$matches = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $matches[] = $row;
 }
 
 // 获取班级名的辅助函数
@@ -61,12 +52,12 @@ function getClassName($class_id) {
             justify-content: center;
             align-items: center;
             height: 100vh;
-            flex-direction: row;
+            flex-direction: column;
         }
 
-        .field-container {
-            width: 45%;
-            max-width: 800px;
+        .matches-container {
+            width: 90%;
+            max-width: 1200px;
             background-color: var(--white);
             padding: 20px;
             margin: 10px;
@@ -76,7 +67,7 @@ function getClassName($class_id) {
             height: 90vh;
         }
 
-        .field-title {
+        .matches-title {
             font-size: 24px;
             font-weight: bold;
             color: var(--nottingham-blue);
@@ -139,9 +130,9 @@ function getClassName($class_id) {
 
         /* 控制自动刷新时间 */
         @media screen and (max-width: 600px) {
-            .field-container {
+            .matches-container {
                 padding: 10px;
-                width: 100%;
+                width: 95%;
             }
             .match p {
                 font-size: 12px;
@@ -151,10 +142,10 @@ function getClassName($class_id) {
 </head>
 <body>
 
-    <!-- 场地 A -->
-    <div class="field-container" id="field-a">
-        <div class="field-title">场地 A</div>
-        <?php foreach ($matches_a as $match): 
+    <!-- 比赛列表 -->
+    <div class="matches-container">
+        <div class="matches-title">比赛列表</div>
+        <?php foreach ($matches as $match): 
             $status = 'pending'; // 默认状态为待开始
             // 如果比赛的开始时间已过，判断其状态
             if ($current_time >= $match['start_time']) {
@@ -178,48 +169,7 @@ function getClassName($class_id) {
         ?>
             <div class="match <?php if ($status == 'in-progress') echo 'highlight'; ?>" id="match-<?= $match['id'] ?>">
                 <p><strong><?= ($status == 'completed' && strpos($result, 'A胜利') !== false) ? "<span class='win'>$class_a_name</span>" : $class_a_name ?> VS <?= ($status == 'completed' && strpos($result, 'B胜利') !== false) ? "<span class='win'>$class_b_name</span>" : $class_b_name ?></strong></p>
-                <p>时间：<?= $match['start_time'] ?> - 场地 <?= $match['field'] ?></p>
-                <p class="status <?= $status ?>">
-                    <?php 
-                    if ($status == 'completed') {
-                        echo "结果：{$result}";
-                    } else {
-                        echo ucfirst($status);
-                    }
-                    ?>
-                </p>
-            </div>
-        <?php endforeach; ?>
-    </div>
-
-    <!-- 场地 B -->
-    <div class="field-container" id="field-b">
-        <div class="field-title">场地 B</div>
-        <?php foreach ($matches_b as $match): 
-            $status = 'pending'; // 默认状态为待开始
-            // 如果比赛的开始时间已过，判断其状态
-            if ($current_time >= $match['start_time']) {
-                if ($match['result']) {
-                    $status = 'completed'; // 已结束
-                } else {
-                    $status = 'in-progress'; // 正在进行中
-                }
-            }
-            
-            // 获取班级名称
-            $class_a_name = getClassName($match['class_a']);
-            $class_b_name = getClassName($match['class_b']);
-            
-            // 处理比赛结果，替换A和B为班级名
-            $result = $match['result'];
-            if ($result) {
-                $result = str_replace('A', $class_a_name, $result);
-                $result = str_replace('B', $class_b_name, $result);
-            }
-        ?>
-            <div class="match <?php if ($status == 'in-progress') echo 'highlight'; ?>" id="match-<?= $match['id'] ?>">
-                <p><strong><?= ($status == 'completed' && strpos($result, 'A胜利') !== false) ? "<span class='win'>$class_a_name</span>" : $class_a_name ?> VS <?= ($status == 'completed' && strpos($result, 'B胜利') !== false) ? "<span class='win'>$class_b_name</span>" : $class_b_name ?></strong></p>
-                <p>时间：<?= $match['start_time'] ?> - 场地 <?= $match['field'] ?></p>
+                <p>时间：<?= $match['start_time'] ?></p>
                 <p class="status <?= $status ?>">
                     <?php 
                     if ($status == 'completed') {

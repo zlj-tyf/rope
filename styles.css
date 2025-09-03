@@ -6,20 +6,20 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     height: 100vh;
 }
 
-.field-container {
-    width: 45%;
-    height: 90vh; /* 设置场地的容器高度为视口高度的90% */
+.matches-container {
+    width: 90%;
+    height: 90vh; /* 设置比赛容器高度为视口高度的90% */
     overflow-y: auto; /* 启用垂直滚动 */
     margin: 10px;
     box-sizing: border-box;
     border: 1px solid #ddd;
 }
 
-.field-title {
+.matches-title {
     font-size: 22px;
     font-weight: bold;
     text-align: center;
