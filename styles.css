@@ -1,0 +1,97 @@
+/* styles.css */
+
+/* 基本的页面布局 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    height: 100vh;
+}
+
+.field-container {
+    width: 45%;
+    height: 90vh; /* 设置场地的容器高度为视口高度的90% */
+    overflow-y: auto; /* 启用垂直滚动 */
+    margin: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+}
+
+.field-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* 比赛块样式 */
+.match {
+    margin: 5px 0;
+    padding: 8px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* 高亮正在进行中的比赛 */
+.highlight {
+    background-color: #dff0d8; /* 高亮显示进行中的比赛 */
+}
+
+/* 状态样式 */
+.status {
+    font-weight: bold;
+}
+
+.status.pending {
+    color: orange;
+}
+
+.status.in-progress {
+    color: green;
+}
+
+.status.completed {
+    color: red; /* 结果的字体颜色设置为红色 */
+}
+
+/* 对阵双方部分的样式 */
+.match-header {
+    font-weight: bold;
+}
+
+.match-header.pending {
+    color: gray;
+}
+
+.match-header.completed .team-a {
+    color: red;
+}
+
+.match-header.completed .team-b {
+    color: red;
+}
+
+/* 自动滚动至当前比赛时的样式 */
+.match p {
+    margin: 4px 0;
+}
+
+.win {
+    color: red; /* 获胜方标红 */
+    font-weight: bold;
+}
+
+/* 为所有页面提供通用的容器样式 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
