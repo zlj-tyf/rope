@@ -7,7 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $class_a_name = $_POST['class_a'];
     $class_b_name = $_POST['class_b'];
     $start_time = $_POST['start_time'];
-    $field = $_POST['field'];
     $result = $_POST['result'];
 
     // 查询 class_a 的 id
@@ -25,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 `class_a` = '$class_a_id', 
                 `class_b` = '$class_b_id', 
                 `start_time` = '$start_time', 
-                `field` = '$field', 
                 `result` = '$result' 
               WHERE `id` = $match_id";
 

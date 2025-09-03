@@ -5,7 +5,6 @@ CREATE TABLE `matches` (
   `class_a` VARCHAR(100) NOT NULL,
   `class_b` VARCHAR(100) NOT NULL,
   `start_time` DATETIME NOT NULL,
-  `field` ENUM('A', 'B') NOT NULL,
   `result` VARCHAR(100) DEFAULT NULL
 );
 

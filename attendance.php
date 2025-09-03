@@ -2,7 +2,7 @@
 include 'db.php';
 
 // 获取所有比赛列表
-$query = "SELECT m.id, c1.class_name AS class_a, c2.class_name AS class_b, m.field 
+$query = "SELECT m.id, c1.class_name AS class_a, c2.class_name AS class_b 
           FROM `matches` m
           JOIN `classes` c1 ON m.class_a = c1.id
           JOIN `classes` c2 ON m.class_b = c2.id";
@@ -140,14 +140,14 @@ if (isset($_GET['match_id'])) {
             <option value="">选择比赛</option>
             <?php while ($match_row = mysqli_fetch_assoc($result_matches)): ?>
                 <option value="<?= $match_row['id'] ?>" <?= isset($match_id) && $match_id == $match_row['id'] ? 'selected' : '' ?>>
-                    <?= $match_row['class_a'] ?> VS <?= $match_row['class_b'] ?> at <?= $match_row['field'] ?>
+                    <?= $match_row['class_a'] ?> VS <?= $match_row['class_b'] ?>
                 </option>
             <?php endwhile; ?>
         </select>
     </form>
 
     <?php if (isset($match_id) && $match): ?>
-        <h3>检录：<?= $match['class_a_name'] ?> VS <?= $match['class_b_name'] ?> (场地 <?= $match['field'] ?>)</h3>
+        <h3>检录：<?= $match['class_a_name'] ?> VS <?= $match['class_b_name'] ?></h3>
 
         <table>
             <tr>

@@ -5,7 +5,6 @@ include 'db.php';
 $class_a_name = $_POST['class_a'];
 $class_b_name = $_POST['class_b'];
 $start_time = $_POST['start_time'];
-$field = $_POST['field'];
 
 // 检查班级 A 是否存在
 $query_a = "SELECT id FROM `classes` WHERE `class_name` = '$class_a_name'";
@@ -31,8 +30,8 @@ $class_a_id = $row_a['id'];
 $class_b_id = $row_b['id'];
 
 // 插入比赛数据
-$query_insert = "INSERT INTO `matches` (`class_a`, `class_b`, `start_time`, `field`, `result`) 
-                 VALUES ('$class_a_id', '$class_b_id', '$start_time', '$field', NULL)";
+$query_insert = "INSERT INTO `matches` (`class_a`, `class_b`, `start_time`, `result`) 
+                 VALUES ('$class_a_id', '$class_b_id', '$start_time', NULL)";
 
 if (mysqli_query($db, $query_insert)) {
     echo "比赛已成功添加！";
