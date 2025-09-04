@@ -1,26 +1,13 @@
 <?php
 include 'db.php';
 
-// 获取当前时间
-$current_time = date('Y-m-d H:i:s');
+// 获取所有比赛
+$query = "SELECT * FROM `matches` ORDER BY `start_time` ASC";
+$result = mysqli_query($db, $query);
 
-// 获取场地A和场地B的比赛信息，包含所有比赛，不仅是正在进行的
-$query_a = "SELECT * FROM `matches` WHERE `field` = 'A' ORDER BY `start_time` ASC";
-$query_b = "SELECT * FROM `matches` WHERE `field` = 'B' ORDER BY `start_time` ASC";
-
-$result_a = mysqli_query($db, $query_a);
-$result_b = mysqli_query($db, $query_b);
-
-// 获取所有场地 A 和场地 B 的比赛
-$matches_a = [];
-$matches_b = [];
-
-while ($row = mysqli_fetch_assoc($result_a)) {
-    $matches_a[] = $row;
-}
-
-while ($row = mysqli_fetch_assoc($result_b)) {
-    $matches_b[] = $row;
+$matches = [];
+while ($row = mysqli_fetch_assoc($result)) {
+    $matches[] = $row;
 }
 
 // 获取班级名的辅助函数
@@ -29,258 +16,248 @@ function getClassName($class_id) {
     $query = "SELECT `class_name` FROM `classes` WHERE `id` = $class_id";
     $result = mysqli_query($db, $query);
     $class = mysqli_fetch_assoc($result);
-    return $class['class_name'] ?? '未知班级'; // 如果没有找到班级名，则返回“未知班级”
+    return $class['class_name'] ?? '未知班级';
+}
+function getWinnerColor($class_id) {
+    if ($class_id >= 1 && $class_id <= 10) {           // 商学院
+        return '#9be3a4'; // Malaysia Sky Blue
+    } elseif ($class_id >= 11 && $class_id <= 23) {   // 人文
+        return '#ea5632'; // Nottingham Blue
+    } elseif ($class_id >= 24 && $class_id <= 40) {   // 理工
+        return '#e9d26a'; // 40% Nottingham Blue
+    } else {                                           // 测试用户
+        return 'blue'; // 红色
+    }
+}
+// 先确定每场比赛的状态
+$prev_result = true;
+$match_statuses = [];
+foreach ($matches as $index => $match) {
+    $status = 'pending';
+    if (!empty($match['result'])) {
+        $status = 'completed';
+        $prev_result = true;
+    } elseif ($prev_result && empty($match['result'])) {
+        $status = 'in-progress';
+        $prev_result = false;
+    } else {
+        $prev_result = false;
+    }
+    $match_statuses[$index] = $status;
+}
+
+// 找出下一场需要检录的比赛（高亮下方的一场）
+$next_match = null;
+foreach ($match_statuses as $i => $status) {
+    if ($status === 'in-progress' && isset($matches[$i+1])) {
+        $next_match = $matches[$i+1];
+        break;
+    }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <title>比赛大屏</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        /* 使用诺丁汉官方颜色 */
-        :root {
-            --nottingham-blue: #10263B;
-            --80-nottingham-blue: #405162;
-            --60-nottingham-blue: #707D89;
-            --40-nottingham-blue: #9FA8B1;
-            --20-nottingham-blue: #CFD4D8;
-            --5-nottingham-blue: #F3F4F5;
-            --portland-stone: #FAF6EF;
-            --40-portland-stone: #FDFBF9;
-        }
+<meta charset="UTF-8">
+<title>比赛大屏</title>
+<style>
+:root {
+    --winner-color: #33AFCD;
+    --gray-pending: #E0E0E0;
+    --blue-inprogress: #99D7E6;
+    --completed-color: #D0D0D0; 
+    --team-bg: #9FA8B1;
+    --team-text: #10263B;
+    --portland-stone: #FAF6EF;
+    --result-red: #E74C3C;
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: var(--portland-stone);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: row;
-        }
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--portland-stone);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 95vh;
+}
 
-        .field-container {
-            width: 45%;
-            max-width: 800px;
-            background-color: var(--white);
-            padding: 20px;
-            margin: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow-y: auto;
-            height: 90vh;
-        }
+.header {
+    width: 100%;
+    text-align: center;
+    padding: 16px 0;
+    background-color: var(--portland-stone);
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 
-        .field-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--nottingham-blue);
-            text-align: center;
-            margin-bottom: 20px;
-        }
+.page-title {
+    font-size: 75px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: var(--team-text);
+}
 
-        .match {
-            background-color: var(--5-nottingham-blue);
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
+.next-match-box {
+    background-color: #10263B;
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 90px;
+    font-weight: bold;
+}
 
-        .match.highlight {
-            background-color:  #99D7E6;
-            /* color: white; */
-        }
+.match-list {
+    width: 100%;
+    max-width: 800px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
 
-        .match p {
-            margin: 6px 0;
-        }
+.match {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 12px;
+    border-radius: 10px;
+    background-color: var(--team-bg);
+    transition: background-color 0.3s;
+}
 
-        .match .status {
-            font-weight: bold;
-        }
+.match.pending { background-color: var(--gray-pending); }
+.match.highlight { background-color: var(--blue-inprogress); }
+.match.completed { background-color: var(--completed-color); }
 
-        /* 标红显示获胜者 */
-        .match .win {
-            color: red;
-        }
+.team {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    color: var(--team-text);
+    margin: 0 15px;
+    background-color: var(--team-bg);
+}
 
-        .status.pending {
-            color: var(--60-nottingham-blue);
-        }
+.team.winner {
+    background-color: var(--winner-color);
+    color: white;
+}
 
-        .status.in-progress {
-            color: var(--nottingham-blue);
-        }
+.time {
+    flex: 0 0 120px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--team-text);
+}
 
-        .status.completed {
-            color: red;
-        }
+.status {
+    font-size: 14px;
+    margin-top: 6px;
+    text-align: center;
+}
 
-        .match strong {
-            color: var(--nottingham-blue);
-        }
+.status.completed { color: var(--result-red); }
 
-        .match:hover {
-            background-color: var(--40-nottingham-blue);
-            cursor: pointer;
-        }
+.back-to-home {
+    z-index: 999;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background-color: #10263B;
+    color: white;
+    font-size: 1.2em;
+    border-radius: 50px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
 
-        /* 样式紧凑 */
-        .match p {
-            font-size: 14px;
-        }
-
-        /* 控制自动刷新时间 */
-        @media screen and (max-width: 600px) {
-            .field-container {
-                padding: 10px;
-                width: 100%;
-            }
-            .match p {
-                font-size: 12px;
-            }
-        }
-    </style>
+.back-to-home:hover { background-color: var(--winner-color); transform: scale(1.1);}
+.back-to-home:active { background-color: #405162; transform: scale(1);}
+</style>
 </head>
 <body>
 
-    <!-- 场地 A -->
-    <div class="field-container" id="field-a">
-        <div class="field-title">场地 A</div>
-        <?php foreach ($matches_a as $match): 
-            $status = 'pending'; // 默认状态为待开始
-            // 如果比赛的开始时间已过，判断其状态
-            if ($current_time >= $match['start_time']) {
-                if ($match['result']) {
-                    $status = 'completed'; // 已结束
-                } else {
-                    $status = 'in-progress'; // 正在进行中
-                }
-            }
-            
-            // 获取班级名称
-            $class_a_name = getClassName($match['class_a']);
-            $class_b_name = getClassName($match['class_b']);
-            
-            // 处理比赛结果，替换A和B为班级名
-            $result = $match['result'];
-            if ($result) {
-                $result = str_replace('A', $class_a_name, $result);
-                $result = str_replace('B', $class_b_name, $result);
-            }
-        ?>
-            <div class="match <?php if ($status == 'in-progress') echo 'highlight'; ?>" id="match-<?= $match['id'] ?>">
-                <p><strong><?= ($status == 'completed' && strpos($result, 'A胜利') !== false) ? "<span class='win'>$class_a_name</span>" : $class_a_name ?> VS <?= ($status == 'completed' && strpos($result, 'B胜利') !== false) ? "<span class='win'>$class_b_name</span>" : $class_b_name ?></strong></p>
-                <p>时间：<?= $match['start_time'] ?> - 场地 <?= $match['field'] ?></p>
-                <p class="status <?= $status ?>">
-                    <?php 
-                    if ($status == 'completed') {
-                        echo "结果：{$result}";
-                    } else {
-                        echo ucfirst($status);
-                    }
-                    ?>
-                </p>
-            </div>
-        <?php endforeach; ?>
+<div class="header">
+    <div class="page-title">比赛大屏</div>
+    <?php if ($next_match): ?>
+    <div class="next-match-box">
+        <?= getClassName($next_match['class_a']) ?> 和 <?= getClassName($next_match['class_b']) ?> 请前往检录台
     </div>
+    <?php endif; ?>
+</div>
 
-    <!-- 场地 B -->
-    <div class="field-container" id="field-b">
-        <div class="field-title">场地 B</div>
-        <?php foreach ($matches_b as $match): 
-            $status = 'pending'; // 默认状态为待开始
-            // 如果比赛的开始时间已过，判断其状态
-            if ($current_time >= $match['start_time']) {
-                if ($match['result']) {
-                    $status = 'completed'; // 已结束
-                } else {
-                    $status = 'in-progress'; // 正在进行中
-                }
-            }
-            
-            // 获取班级名称
-            $class_a_name = getClassName($match['class_a']);
-            $class_b_name = getClassName($match['class_b']);
-            
-            // 处理比赛结果，替换A和B为班级名
-            $result = $match['result'];
-            if ($result) {
-                $result = str_replace('A', $class_a_name, $result);
-                $result = str_replace('B', $class_b_name, $result);
-            }
-        ?>
-            <div class="match <?php if ($status == 'in-progress') echo 'highlight'; ?>" id="match-<?= $match['id'] ?>">
-                <p><strong><?= ($status == 'completed' && strpos($result, 'A胜利') !== false) ? "<span class='win'>$class_a_name</span>" : $class_a_name ?> VS <?= ($status == 'completed' && strpos($result, 'B胜利') !== false) ? "<span class='win'>$class_b_name</span>" : $class_b_name ?></strong></p>
-                <p>时间：<?= $match['start_time'] ?> - 场地 <?= $match['field'] ?></p>
-                <p class="status <?= $status ?>">
-                    <?php 
-                    if ($status == 'completed') {
-                        echo "结果：{$result}";
-                    } else {
-                        echo ucfirst($status);
-                    }
-                    ?>
-                </p>
-            </div>
-        <?php endforeach; ?>
+<div class="match-list">
+<?php 
+foreach ($matches as $i => $match):
+    $status = $match_statuses[$i];
+
+    $class_a_name = getClassName($match['class_a']);
+    $class_b_name = getClassName($match['class_b']);
+
+    $winner_a = ($status === 'completed' && strpos($match['result'], 'A胜利') !== false);
+    $winner_b = ($status === 'completed' && strpos($match['result'], 'B胜利') !== false);
+    // echo $winner_a.' | '.$winner_b;
+    // 胜利班级名字替换
+    if ($winner_a) $class_a_name = ' 🎉 '.getClassName($match['class_a']);
+    if ($winner_b) $class_b_name = ' 🎉 '.getClassName($match['class_b']);
+?>
+<div class="match <?= $status==='in-progress'?'highlight':($status==='pending'?'pending':'completed'); ?>">
+    <div class="team" <?= $winner_a ? 'style="background-color:'.getWinnerColor($match['class_a']).';color:white;"' : '' ?>>
+    <?= $class_a_name ?>
+</div>
+
+
+    <div class="time">
+        <?= date('H:i', strtotime($match['start_time'])) ?> <!-- 预计时间 -->
+        <div class="status <?= $status==='completed'?'completed':'' ?>">
+<?php
+if ($status === 'completed') {
+    if ($winner_a) {
+        echo getClassName($match['class_a']) . '胜利';
+    } elseif ($winner_b) {
+        echo getClassName($match['class_b']) . '胜利';
+    } else {
+        echo '';
+    }
+} elseif ($status === 'in-progress') {
+    echo '进行中';
+} else {
+    echo '未开始';
+}
+?>
+
+        </div>
     </div>
+<div class="team" <?= $winner_b ? 'style="background-color:'.getWinnerColor($match['class_b']).';color:white;"' : '' ?>>
+    <?= $class_b_name ?>
+</div></div>
+<?php endforeach; ?>
+</div>
 
-    <script>
-        window.onload = function() {
-            // 自动滚动到当前进行中的比赛
-            const currentMatch = document.querySelector('.highlight');
-            if (currentMatch) {
-                currentMatch.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        };
-    </script><footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:999;">
-    For tech support: Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
-    &nbsp;|&nbsp; 
+<a href="index.php" class="back-to-home">回首页</a>
+<footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:99;">
+    For tech support: Contact Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
 </footer>
-<!-- 回首页按钮 -->
-<a href="index.php" class="back-to-home">
-    回首页
-</a>
 
-<style>
-    /* 悬浮按钮的样式 */
-    .back-to-home {
-        z-index: 999;
-        position: fixed;
-        bottom: 20px;  /* 距离页面底部 20px */
-        right: 20px;   /* 距离页面右边 20px */
-        padding: 10px 20px;
-        background-color: #10263B;  /* Nottingham Blue */
-        color: white;
-        font-size: 1.5em;
-        border-radius: 50px;  /* 圆角 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  /* 阴影效果 */
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+<script>
+window.onload = function(){
+    const currentMatch = document.querySelector('.highlight');
+    if(currentMatch){
+        currentMatch.scrollIntoView({behavior:'smooth', block:'center'});
     }
+};
+</script>
 
-    .back-to-home:hover {
-        background-color: #33AFCD;  /* 80% Malaysia Sky Blue */
-        transform: scale(1.1);  /* 放大效果 */
-    }
-
-    .back-to-home:active {
-        background-color: #405162;  /* 80% Nottingham Blue */
-        transform: scale(1);  /* 确保按下时没有放大效果 */
-    }
-</style>
 </body>
 </html>

@@ -7,7 +7,7 @@ body {
     padding: 0;
     display: flex;
     justify-content: space-between;
-    height: 100vh;
+    height: 95vh;
 }
 
 .field-container {

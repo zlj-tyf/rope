@@ -20,6 +20,7 @@ $result_classes = mysqli_query($db, $query_classes);
             margin: 0;
             padding: 0;
             line-height: 1.6;
+            height:95vh;
         }
 
         h2, h3 {
@@ -58,20 +59,11 @@ $result_classes = mysqli_query($db, $query_classes);
             border-radius: 6px;
         }
 
-        .form-container text-input{
-            width: 20px;
-            padding: 8px;
-            font-size: 1rem;
-            border: 1px solid #405162;
-            border-radius: 6px;
-        }
-
         .form-container button {
             background-color: #10263B; /* Nottingham Blue */
             color: white;
             padding: 10px 20px;
             font-size: 1rem;
-            /* font-color:white; */
             border: none;
             border-radius: 6px;
             cursor: pointer;
@@ -114,14 +106,12 @@ $result_classes = mysqli_query($db, $query_classes);
         }
 
         td input, td select {
-            /* width: 150px; */
             padding: 10px;
             margin: 0;
             font-size: 1rem;
             border: 1px solid #405162;
             border-radius: 6px;
             width: auto;
-            margin: 0;
         }
 
         td button {
@@ -137,17 +127,39 @@ $result_classes = mysqli_query($db, $query_classes);
 
         /* 高亮未结束的比赛 */
         .highlight {
-            background-color: #33AFCD; /* 80% Nottingham Blue */
+            background-color: #33AFCD; /* 80% Malaysia Sky Blue */
             color: white;
         }
 
+        /* 状态按钮 */
+        .status-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 6px;
+            border: 1px solid #10263B;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #fff;
+            color: #10263B;
+            transition: all 0.2s;
+        }
+
+        .status-btn.active {
+            background-color: #33AFCD; /* 蓝底 */
+            color: #000; /* 黑字 */
+        }
+
+        .status-btn:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
     <h2>管理比赛</h2>
 
     <div class="form-container">
-        <form action="add_match.php" method="POST" onsubmit="return validateClasses(event)">
+        <form action="add_match.php" method="POST">
             <label for="class_a">班级 A:</label>
             <input class="text-input" type="text" id="class_a" name="class_a" placeholder="请输入班级 A 名称" required>
 
@@ -157,39 +169,29 @@ $result_classes = mysqli_query($db, $query_classes);
             <label for="start_time">开始时间:</label>
             <input type="datetime-local" name="start_time" required>
 
-            <label for="field">场地:</label>
-            <select name="field">
-                <option value="A">场地 A</option>
-                <option value="B">场地 B</option>
-            </select>
-
-            <label hidden for="result">结果:</label>
-            <input hidden type="radio" name="result" value="未结束" checked> 
-            <input hidden type="radio" name="result" value="A胜利">
-            <input hidden type="radio" name="result" value="B胜利">
-
             <button type="submit">添加比赛</button>
         </form>
     </div>
 
-    <h3>比赛列表(高亮为待开始比赛)</h3>
+    <!-- 比赛列表 -->
+<h3>比赛列表(高亮为待开始比赛)</h3>
+
+<!-- 新增容器包裹表格 -->
+<div class="table-container">
     <table>
         <tr>
             <th>班级 A</th>
             <th>班级 B</th>
             <th>开始时间</th>
-            <th>场地</th>
             <th>结果</th>
             <th>操作</th>
         </tr>
-        
+
         <?php 
-        // 获取所有比赛数据并显示
-        $query_matches = "SELECT * FROM `matches`";
+        $query_matches = "SELECT * FROM `matches` ORDER BY `start_time` ASC";
         $result_matches = mysqli_query($db, $query_matches);
 
         while ($match = mysqli_fetch_assoc($result_matches)): 
-            // 获取班级 A 和 B 名称
             $class_a_query = "SELECT class_name FROM `classes` WHERE `id` = {$match['class_a']}";
             $class_a_result = mysqli_query($db, $class_a_query);
             $class_a = mysqli_fetch_assoc($class_a_result);
@@ -212,15 +214,16 @@ $result_classes = mysqli_query($db, $query_classes);
                     <input type="datetime-local" name="start_time" value="<?= $match['start_time'] ?>" required>
                 </td>
                 <td>
-                    <select name="field">
-                        <option value="A" <?= $match['field'] == 'A' ? 'selected' : '' ?>>场地 A</option>
-                        <option value="B" <?= $match['field'] == 'B' ? 'selected' : '' ?>>场地 B</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="radio" name="result" value="未结束" <?= $match['result'] == '未结束' ? 'checked' : '' ?>> 未结束
-                    <input type="radio" name="result" value="A胜利" <?= $match['result'] == 'A胜利' ? 'checked' : '' ?>> A胜利
-                    <input type="radio" name="result" value="B胜利" <?= $match['result'] == 'B胜利' ? 'checked' : '' ?>> B胜利
+                    <?php 
+                    $statuses = ['未结束', 'A胜利', 'B胜利'];
+                    foreach ($statuses as $s): 
+                        $checked = ($match['result'] == $s) ? 'checked' : '';
+                    ?>
+                        <label class="status-btn <?= $checked ? 'active' : '' ?>">
+                            <input type="radio" name="result" value="<?= $s ?>" <?= $checked ?> hidden>
+                            <?= $s ?>
+                        </label>
+                    <?php endforeach; ?>
                 </td>
                 <td>
                     <button type="submit">更新</button>
@@ -230,42 +233,85 @@ $result_classes = mysqli_query($db, $query_classes);
 
         <?php endwhile; ?>
     </table>
-  <!-- 回首页按钮 -->
-<a href="index.php" class="back-to-home">
-    回首页
-</a>
+</div>
 
 <style>
-    /* 悬浮按钮的样式 */
-    .back-to-home {
-        z-index: 999;
-        position: fixed;
-        bottom: 20px;  /* 距离页面底部 20px */
-        right: 20px;   /* 距离页面右边 20px */
-        padding: 10px 20px;
-        background-color: #10263B;  /* Nottingham Blue */
-        color: white;
-        font-size: 1.5em;
-        border-radius: 50px;  /* 圆角 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  /* 阴影效果 */
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.3s ease;
+    /* 表格滚动容器 */
+    .table-container {
+        max-height: 60vh; /* 根据需要调整高度 */
+        overflow-y: auto;
+        margin: 20px auto;
+        width: 90%;
     }
 
-    .back-to-home:hover {
-        background-color: #33AFCD;  /* 80% Malaysia Sky Blue */
-        transform: scale(1.1);  /* 放大效果 */
+    /* 避免表格被圆角裁剪 */
+    .table-container table {
+        border-radius: 8px;
     }
+</style>
 
-    .back-to-home:active {
-        background-color: #405162;  /* 80% Nottingham Blue */
-        transform: scale(1);  /* 确保按下时没有放大效果 */
-    }
-</style>  <footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:999;">
-    For tech support: Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
-    &nbsp;|&nbsp; 
-</footer>
+    <!-- 回首页按钮 -->
+    <a href="index.php" class="back-to-home">回首页</a>
+
+    <style>
+        .back-to-home {
+            z-index: 999;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #10263B;
+            color: white;
+            font-size: 1.5em;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .back-to-home:hover {
+            background-color: #33AFCD;
+            transform: scale(1.1);
+        }
+        .back-to-home:active {
+            background-color: #405162;
+            transform: scale(1);
+        }
+    </style>
+
+    <footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:99;">
+        For tech support: Contact Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
+    </footer>
+
+    <script>
+document.querySelectorAll('.status-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const matchRow = btn.closest('tr');
+        const matchId = matchRow.querySelector('input[name="match_id"]').value;
+        const status = btn.innerText;
+
+        // 取消同组按钮的 active
+        matchRow.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+
+        // 激活当前按钮
+        btn.classList.add('active');
+
+        // AJAX 实时更新数据库
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_result.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                console.log('更新成功：', xhr.responseText);
+            } else {
+                alert('更新失败');
+            }
+        };
+        xhr.send('match_id=' + encodeURIComponent(matchId) + '&result=' + encodeURIComponent(status));
+    });
+});
+</script>
+
 </body>
 </html>

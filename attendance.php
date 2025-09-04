@@ -2,7 +2,7 @@
 include 'db.php';
 
 // 获取所有比赛列表
-$query = "SELECT m.id, c1.class_name AS class_a, c2.class_name AS class_b, m.field 
+$query = "SELECT m.id, c1.class_name AS class_a, c2.class_name AS class_b
           FROM `matches` m
           JOIN `classes` c1 ON m.class_a = c1.id
           JOIN `classes` c2 ON m.class_b = c2.id";
@@ -40,7 +40,7 @@ if (isset($_GET['match_id'])) {
     $result_attendance = mysqli_query($db, $query_attendance);
     $attendance_data = [];
     while ($attendance = mysqli_fetch_assoc($result_attendance)) {
-        $attendance_data[$attendance['student_id']] = $attendance['checked_in'];
+        $attendance_data[$attendance['student_id']] = $attendance['status'] === '已签到' ? 1 : 0;
     }
 }
 ?>
@@ -124,11 +124,11 @@ if (isset($_GET['match_id'])) {
         }
 
         .not-checked-in {
-            color: red; /* 5% Nottingham Blue */
+            color: red; 
         }
 
         .student-row:hover {
-            background-color: #F0F4F8; /* Light gray hover effect */
+            background-color: #F0F4F8;
         }
     </style>
 </head>
@@ -140,14 +140,14 @@ if (isset($_GET['match_id'])) {
             <option value="">选择比赛</option>
             <?php while ($match_row = mysqli_fetch_assoc($result_matches)): ?>
                 <option value="<?= $match_row['id'] ?>" <?= isset($match_id) && $match_id == $match_row['id'] ? 'selected' : '' ?>>
-                    <?= $match_row['class_a'] ?> VS <?= $match_row['class_b'] ?> at <?= $match_row['field'] ?>
+                    <?= $match_row['class_a'] ?> VS <?= $match_row['class_b'] ?>
                 </option>
             <?php endwhile; ?>
         </select>
     </form>
 
     <?php if (isset($match_id) && $match): ?>
-        <h3>检录：<?= $match['class_a_name'] ?> VS <?= $match['class_b_name'] ?> (场地 <?= $match['field'] ?>)</h3>
+        <h3>检录：<?= $match['class_a_name'] ?> VS <?= $match['class_b_name'] ?></h3>
 
         <table>
             <tr>
@@ -219,42 +219,38 @@ if (isset($_GET['match_id'])) {
             });
         });
     </script>
-    <!-- 回首页按钮 -->
-<a href="index.php" class="back-to-home">
-    回首页
-</a>
 
-<style>
-    /* 悬浮按钮的样式 */
-    .back-to-home {
-        z-index: 999;
-        position: fixed;
-        bottom: 20px;  /* 距离页面底部 20px */
-        right: 20px;   /* 距离页面右边 20px */
-        padding: 10px 20px;
-        background-color: #10263B;  /* Nottingham Blue */
-        color: white;
-        font-size: 1.5em;
-        border-radius: 50px;  /* 圆角 */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);  /* 阴影效果 */
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        transition: background-color 0.3s ease, transform 0.3s ease;
-    }
+    <a href="index.php" class="back-to-home">回首页</a>
 
-    .back-to-home:hover {
-        background-color: #33AFCD;  /* 80% Malaysia Sky Blue */
-        transform: scale(1.1);  /* 放大效果 */
-    }
+    <style>
+        .back-to-home {
+            z-index: 999;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #10263B;
+            color: white;
+            font-size: 1.5em;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .back-to-home:hover {
+            background-color: #33AFCD;
+            transform: scale(1.1);
+        }
+        .back-to-home:active {
+            background-color: #405162;
+            transform: scale(1);
+        }
+    </style>
 
-    .back-to-home:active {
-        background-color: #405162;  /* 80% Nottingham Blue */
-        transform: scale(1);  /* 确保按下时没有放大效果 */
-    }
-</style><footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:999;">
-    For tech support: Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
-    &nbsp;|&nbsp; 
-</footer>
+    <footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:999;">
+        For tech support: Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
+    </footer>
 </body>
 </html>

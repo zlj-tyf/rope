@@ -1,11 +1,11 @@
 CREATE DATABASE IF NOT EXISTS rope;
-use rope;
+USE rope;
+
 CREATE TABLE `matches` (
   `id` INT(11) AUTO_INCREMENT PRIMARY KEY,
   `class_a` VARCHAR(100) NOT NULL,
   `class_b` VARCHAR(100) NOT NULL,
   `start_time` DATETIME NOT NULL,
-  `field` ENUM('A', 'B') NOT NULL,
   `result` VARCHAR(100) DEFAULT NULL
 );
 
