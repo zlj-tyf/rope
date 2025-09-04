@@ -19,6 +19,7 @@ $result_classes = mysqli_query($db, $query);
             color: #10263B; /* Nottingham Blue */
             margin: 0;
             padding: 0;
+            /* height:95vh; */
         }
 
         h2, h3 {

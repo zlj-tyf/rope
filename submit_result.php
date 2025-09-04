@@ -61,6 +61,8 @@ foreach ($matches as $i => $m) {
 
 // 找上一场比赛
 $prev_match = $current_match_index > 0 ? $matches[$current_match_index - 1] : null;
+// 找下一场比赛
+$next_match = $current_match_index < count($matches) - 1 ? $matches[$current_match_index + 1] : null;
 
 // 获取当前比赛的胜利状态
 $winner_a = $current_match['result'] === 'A胜利';
@@ -143,11 +145,19 @@ button:hover {
 </form>
 
 <?php if ($prev_match): ?>
-    <form method="GET" style="margin-top:40px;">
+    <form method="GET" style="margin-top:40px; display:inline-block;">
         <input type="hidden" name="match_id" value="<?= $prev_match['id'] ?>">
-        <button type="submit" class="button-prev">返回上一场比赛</button>
+        <button type="submit" class="button-prev">上一场比赛</button>
     </form>
 <?php endif; ?>
+
+<?php if ($next_match): ?>
+    <form method="GET" style="margin-top:40px; display:inline-block;">
+        <input type="hidden" name="match_id" value="<?= $next_match['id'] ?>">
+        <button type="submit" class="button-prev">下一场比赛</button>
+    </form>
+<?php endif; ?>
+
 
 <?php endif; ?>
 <a href="index.php" class="back-to-home">

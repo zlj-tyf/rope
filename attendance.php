@@ -40,7 +40,7 @@ if (isset($_GET['match_id'])) {
     $result_attendance = mysqli_query($db, $query_attendance);
     $attendance_data = [];
     while ($attendance = mysqli_fetch_assoc($result_attendance)) {
-        $attendance_data[$attendance['student_id']] = $attendance['status'] === '已签到' ? 1 : 0;
+$attendance_data[$attendance['student_id']] = intval($attendance['checked_in']);
     }
 }
 ?>
@@ -224,7 +224,7 @@ if (isset($_GET['match_id'])) {
 
     <style>
         .back-to-home {
-            z-index: 999;
+            z-index: 9999;
             position: fixed;
             bottom: 20px;
             right: 20px;
