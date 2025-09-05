@@ -1,0 +1,124 @@
+-- Adminer 5.3.0 MySQL 8.0.43-0ubuntu0.22.04.1 dump
+
+SET NAMES utf8;
+SET time_zone = '+00:00';
+SET foreign_key_checks = 0;
+SET sql_mode = 'NO_AUTO_VALUE_ON_ZERO';
+
+SET NAMES utf8mb4;
+
+DROP DATABASE IF EXISTS `rope`;
+CREATE DATABASE `rope` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `rope`;
+
+DROP TABLE IF EXISTS `attendance`;
+CREATE TABLE `attendance` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `match_id` int NOT NULL,
+  `student_id` int NOT NULL,
+  `status` enum('未签到','已签到') DEFAULT '未签到',
+  PRIMARY KEY (`id`),
+  KEY `match_id` (`match_id`),
+  KEY `student_id` (`student_id`),
+  CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`match_id`) REFERENCES `matches` (`id`),
+  CONSTRAINT `attendance_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+TRUNCATE `attendance`;
+
+DROP TABLE IF EXISTS `classes`;
+CREATE TABLE `classes` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `class_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+TRUNCATE `classes`;
+INSERT INTO `classes` (`id`, `class_name`) VALUES
+(1,	'2501'),
+(2,	'2502'),
+(3,	'2503'),
+(4,	'2504'),
+(5,	'2505'),
+(6,	'2506'),
+(7,	'2507'),
+(8,	'2508'),
+(9,	'2509'),
+(10,	'2510'),
+(11,	'2511'),
+(12,	'2512'),
+(13,	'2513'),
+(14,	'2514'),
+(15,	'2515'),
+(16,	'2516'),
+(17,	'2517'),
+(18,	'2518'),
+(19,	'2519'),
+(20,	'2520'),
+(21,	'2521'),
+(22,	'2522'),
+(23,	'2523'),
+(24,	'2524'),
+(25,	'2525'),
+(26,	'2526'),
+(27,	'2527'),
+(28,	'2528'),
+(29,	'2529'),
+(30,	'2530'),
+(31,	'2531'),
+(32,	'2532'),
+(33,	'2533'),
+(34,	'2534'),
+(35,	'2535'),
+(36,	'2536'),
+(37,	'2537'),
+(38,	'2538'),
+(39,	'2539'),
+(40,	'2540');
+
+DROP TABLE IF EXISTS `matches`;
+CREATE TABLE `matches` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `class_a` varchar(100) NOT NULL,
+  `class_b` varchar(100) NOT NULL,
+  `start_time` datetime NOT NULL,
+  `result` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+TRUNCATE `matches`;
+INSERT INTO `matches` (`id`, `class_a`, `class_b`, `start_time`, `result`) VALUES
+(1,	'27',	'11',	'2025-09-06 13:30:00',	NULL),
+(2,	'04',	'40',	'2025-09-06 13:35:00',	NULL),
+(3,	'18',	'03',	'2025-09-06 13:40:00',	NULL),
+(4,	'33',	'16',	'2025-09-06 13:45:00',	NULL),
+(5,	'36',	'17',	'2025-09-06 13:50:00',	NULL),
+(6,	'31',	'32',	'2025-09-06 13:55:00',	NULL),
+(7,	'34',	'23',	'2025-09-06 14:00:00',	NULL),
+(8,	'12',	'09',	'2025-09-06 14:05:00',	NULL),
+(9,	'08',	'30',	'2025-09-06 14:10:00',	NULL),
+(10,	'14',	'37',	'2025-09-06 14:15:00',	NULL),
+(11,	'20',	'28',	'2025-09-06 15:20:00',	NULL),
+(12,	'25',	'39',	'2025-09-06 15:25:00',	NULL),
+(13,	'22',	'10',	'2025-09-06 15:30:00',	NULL),
+(14,	'05',	'21',	'2025-09-06 15:35:00',	NULL),
+(15,	'13',	'06',	'2025-09-06 15:40:00',	NULL),
+(16,	'01',	'02',	'2025-09-06 15:45:00',	NULL),
+(17,	'29',	'38',	'2025-09-06 15:50:00',	NULL),
+(18,	'24',	'35',	'2025-09-06 15:55:00',	NULL),
+(19,	'19',	'26',	'2025-09-06 16:00:00',	NULL),
+(20,	'15',	'07',	'2025-09-06 16:05:00',	NULL);
+
+DROP TABLE IF EXISTS `students`;
+CREATE TABLE `students` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `class_id` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `class_id` (`class_id`),
+  CONSTRAINT `students_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+TRUNCATE `students`;
+
+-- 2025-09-04 09:15:49 UTC

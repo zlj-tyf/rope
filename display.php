@@ -61,6 +61,34 @@ foreach ($match_statuses as $i => $status) {
 <head>
 <meta charset="UTF-8">
 <title>比赛大屏</title>
+
+<style>
+.qr-code {
+    align-content:center;
+    text-align:center;
+    position: fixed;
+    top: 20px;
+    width: 20vh;
+    height: 25vh;
+    z-index: 1000;
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.qr-code.left{ left: 20px;}
+.qr-code.right{ right: 20px;}
+.qr-code img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+.qr-code .qr-text {
+    font-size: 2em;
+    align:center;
+    color: #10263B;
+}
+</style>
 <style>
 :root {
     --winner-color: #33AFCD;
@@ -110,8 +138,8 @@ body {
 }
 
 .match-list {
-    width: 100%;
-    max-width: 800px;
+    width: 80%;
+    /* max-width: 800px; */
     flex: 1;
     overflow-y: auto;
     padding: 20px;
@@ -121,6 +149,7 @@ body {
 }
 
 .match {
+    font-size:2em;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -136,9 +165,10 @@ body {
 .match.completed { background-color: var(--completed-color); }
 
 .team {
+    font-size:2em;
     flex: 1;
     text-align: center;
-    padding: 12px;
+    padding: 24px;
     border-radius: 20px;
     font-weight: bold;
     color: var(--team-text);
@@ -152,15 +182,17 @@ body {
 }
 
 .time {
+    min-width:20%;
     flex: 0 0 120px;
     text-align: center;
-    font-size: 16px;
+    font-size: 1em;
     font-weight: bold;
     color: var(--team-text);
 }
 
 .status {
-    font-size: 14px;
+    min-width:20%;
+    font-size: 1.5em;
     margin-top: 6px;
     text-align: center;
 }
@@ -187,6 +219,15 @@ body {
 </style>
 </head>
 <body>
+<div class="qr-code left">
+    <img src="https://baijiahao.baidu.com/bjh/picproxy?param=DWnUSb9ggzjyVByU+pZSOerOMfokx+NdPr9l4D4Ab+WGJQI1gOI5dbE4BWetdsyiB9eszxeAdyPjxsS/ypDtvtvTX7+ELoVB3hxbkhGrhLC5NS8wct8fSci2V7zeP2pU3OLK8rpV359tZ5zpHXuss83bOs3P4vc+" alt="二维码">
+    <div class="qr-text">当前页面</div>
+</div>
+
+<div class="qr-code right">
+    <img src="https://baijiahao.baidu.com/bjh/picproxy?param=DWnUSb9ggzjyVByU+pZSOerOMfokx+NdPr9l4D4Ab+WGJQI1gOI5dbE4BWetdsyiB9eszxeAdyPjxsS/ypDtvtvTX7+ELoVBWUTk/4NBGN3kQFGGPdwijn2V9gkEsws3YOBUz8wpgSgQM1pY3iGO483bOs3P4vc+" alt="二维码">
+    <div class="qr-text">图片直播</div>
+</div>
 
 <div class="header">
     <div class="page-title">比赛大屏</div>
@@ -245,7 +286,7 @@ if ($status === 'completed') {
 <?php endforeach; ?>
 </div>
 
-<a href="index.php" class="back-to-home">回首页</a>
+<a href="index.html" class="back-to-home">回首页</a>
 <footer style="position:fixed; left:0; bottom:0; width:100%; background:#fff; border-top:1px solid #e0e6ed; box-shadow:0 -2px 8px rgba(52,152,219,0.08); padding:12px 0; color:#666; font-size:1em; text-align:center; z-index:99;">
     For tech support: Contact Lijie ZHOU (20809020 <a href="mailto:scylz12@nottingham.edu.cn" style="color:#2980b9;text-decoration:none;">scylz12@nottingham.edu.cn</a>)
 </footer>

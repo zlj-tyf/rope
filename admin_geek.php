@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_match_result'])
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>看起来很牛逼的拔河管理后台</title>
+    <title>拔河管理后台</title>
     <style>
         /* --- 页面统一圆角 --- */
 button, input, select, textarea, .match, .result-buttons button {
@@ -175,7 +175,7 @@ button, input, select, textarea, .match, .result-buttons button {
     </style>
 </head>
 <body>
-<div class="big-title">看起来很牛逼的拔河管理后台</div>
+<div class="big-title">拔河管理后台</div>
 <div class="container">
     <!-- Display Section -->
     <div class="column left">
@@ -312,7 +312,7 @@ button, input, select, textarea, .match, .result-buttons button {
         </div>
     </div>
 </div>
-<a href="index.php" class="back-to-home">回首页</a>
+<a href="index.html" class="back-to-home">回首页</a>
 <footer>
     For tech support: Contact Lijie ZHOU (20809020
     <a href="mailto:scylz12@nottingham.edu.cn">scylz12@nottingham.edu.cn</a>)

@@ -251,7 +251,7 @@ $result_classes = mysqli_query($db, $query_classes);
 </style>
 
     <!-- 回首页按钮 -->
-    <a href="index.php" class="back-to-home">回首页</a>
+    <a href="index.html" class="back-to-home">回首页</a>
 
     <style>
         .back-to-home {

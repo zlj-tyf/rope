@@ -78,6 +78,7 @@ $text_b = ($winner_b ? '🎉 ' : '') . getClassName($current_match['class_b']) .
 <head>
 <meta charset="UTF-8">
 <title>比赛结果提交</title>
+
 <style>
 body {
     font-size: 35px; /* 原来50px，缩小约30% */
@@ -160,7 +161,7 @@ button:hover {
 
 
 <?php endif; ?>
-<a href="index.php" class="back-to-home">
+<a href="index.html" class="back-to-home">
     回首页
 </a>
 

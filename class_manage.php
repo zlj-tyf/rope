@@ -126,7 +126,7 @@ $result_classes = mysqli_query($db, $query);
         <?php endwhile; ?>
     </table>
     <!-- 回首页按钮 -->
-<a href="index.php" class="back-to-home">
+<a href="index.html" class="back-to-home">
     回首页
 </a>
 
